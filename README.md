@@ -2,7 +2,8 @@ Gocash Community Core (Version 1.1.1.7)
 
 Website: http://www.gocash.top 
 
-Block explorer: coming soon 
+Block explorer: http://66.42.52.30:3001
+
 
 Coin Specs :
 
