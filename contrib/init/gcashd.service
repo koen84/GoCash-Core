@@ -1,0 +1,26 @@
+[Unit]
+Description=GCASH's distributed currency daemon
+After=network.target
+
+[Service]
+User=gcash
+Group=gcash
+
+Type=forking
+PIDFile=/var/lib/gcashd/gcashd.pid
+
+ExecStart=/usr/bin/gcashd -daemon -pid=/var/lib/gcashd/gcashd.pid \
+          -conf=/etc/gcash/gcash.conf -datadir=/var/lib/gcashd
+
+ExecStop=-/usr/bin/gcash-cli -conf=/etc/gcash/gcash.conf \
+         -datadir=/var/lib/gcashd stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

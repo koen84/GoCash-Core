@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=GCASH
+Comment=GCASH P2P Cryptocurrency
+Exec=gcash-qt %u
+Terminal=false
+Type=Application
+Icon=gcash128
+MimeType=x-scheme-handler/gcash;
+Categories=Office;Finance;
+Name[en_US]=gcash-qt.desktop
