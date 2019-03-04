@@ -15,3 +15,8 @@ Coin Specs :
 - MN reward: 60%
 - POS reward: 40%
 - Min staking Age: 60 min.
+
+Exchange :
+https://altmarkets.io/trading/gocashbtc
+https://wadax.io/trade/GCASHBTC
+https://vaultmex.com/trade/GCASH/BTC
