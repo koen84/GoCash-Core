@@ -1,4 +1,4 @@
-Gocash Community Core (Version 1.1.1.7) 
+Gocash Community Core (Version 1.1.1.8) 
 
 Website: http://www.gocash.top 
 
