@@ -116,7 +116,7 @@ public:
         nMinerThreads = 0;
         nTargetTimespan = 1 * 60;
         nTargetSpacing = 1 * 60;
-        nLastPOWBlock = 100;
+        nLastPOWBlock = 411100;
         nMaturity = 30;
         nMasternodeCountDrift = 20;
 	    nMasternodeColleteralLimxDev = 10000; //Params().MasternodeColleteralLimxDev()
@@ -222,7 +222,7 @@ genesis hash: 00000b1a5a099291be2a4c5fabd507f8d808210bc5455975109111246384a9b8
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
-        fSkipProofOfWorkCheck = false;
+        fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
         fHeadersFirstSyncingActive = false;
 
