@@ -118,7 +118,7 @@ public:
         nTargetSpacing = 1 * 60;
         nLastPOWBlock = 411100;
         nMaturity = 30;
-        nMasternodeCountDrift = 20;
+        nMasternodeCountDrift = 5;
 	    nMasternodeColleteralLimxDev = 10000; //Params().MasternodeColleteralLimxDev()
         nModifierUpdateBlock = 1; // we use the version 2 for dmd
         nMaxMoneyOut = 5000000 * COIN;
@@ -217,14 +217,14 @@ genesis hash: 00000b1a5a099291be2a4c5fabd507f8d808210bc5455975109111246384a9b8
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
         fRequireRPCPassword = true;
-        fMiningRequiresPeers = false;
+        fMiningRequiresPeers = true;
         fAllowMinDifficultyBlocks = false;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
         fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
-        fHeadersFirstSyncingActive = false;
+        fHeadersFirstSyncingActive = true;
 
 
         nPoolMaxTransactions = 3;
