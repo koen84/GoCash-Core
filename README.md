@@ -1,6 +1,6 @@
 Gocash Community Core (Version 1.1.1.8) 
 
-Website: http://www.gocash.top 
+Website: http://www.gocash.top (moving)
 
 Block explorer: http://66.42.52.30:3001
 
