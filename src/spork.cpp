@@ -10,6 +10,7 @@
 #include "protocol.h"
 #include "sync.h"
 #include "util.h"
+#include "sporkdb.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -22,7 +23,6 @@ CSporkManager sporkManager;
 
 std::map<uint256, CSporkMessage> mapSporks;
 std::map<int, CSporkMessage> mapSporksActive;
-
 
 void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
@@ -48,6 +48,15 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 
         LogPrintf("spork - new %s ID %d Time %d bestHeight %d\n", hash.ToString(), spork.nSporkID, spork.nValue, chainActive.Tip()->nHeight);
 
+				        if (spork.nTimeSigned >= Params().NewSporkStart()) {
+            if (!sporkManager.CheckSignature(spork, true)) {
+                LogPrintf("%s : Invalid Signature\n", __func__);
+                Misbehaving(pfrom->GetId(), 100);
+                return;
+            }
+        }
+
+
         if (!sporkManager.CheckSignature(spork)) {
             LogPrintf("spork - invalid signature\n");
             Misbehaving(pfrom->GetId(), 100);
@@ -58,7 +67,9 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
         mapSporksActive[spork.nSporkID] = spork;
         sporkManager.Relay(spork);
 
-        //does a task if needed
+
+
+       //does a task if needed
         ExecuteSpork(spork.nSporkID, spork.nValue);
     }
     if (strCommand == "getsporks") {
@@ -92,6 +103,7 @@ bool IsSporkActive(int nSporkID)
         if (nSporkID == SPORK_14_NEW_PROTOCOL_ENFORCEMENT) r = SPORK_14_NEW_PROTOCOL_ENFORCEMENT_DEFAULT;
 		if (nSporkID == SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2) r = SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2_DEFAULT;
         if (nSporkID == SPORK_16_MN_WINNER_MINIMUM_AGE) r = SPORK_16_MN_WINNER_MINIMUM_AGE_DEFAULT;
+		if (nSporkID == SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3) r = SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3_DEFAULT;
 
         if (r == -1) LogPrintf("GetSpork::Unknown Spork %d\n", nSporkID);
     }
@@ -121,6 +133,7 @@ int64_t GetSporkValue(int nSporkID)
         if (nSporkID == SPORK_14_NEW_PROTOCOL_ENFORCEMENT) r = SPORK_14_NEW_PROTOCOL_ENFORCEMENT_DEFAULT;
 		if (nSporkID == SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2) r = SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2_DEFAULT;
         if (nSporkID == SPORK_16_MN_WINNER_MINIMUM_AGE) r = SPORK_16_MN_WINNER_MINIMUM_AGE_DEFAULT;
+		if (nSporkID == SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3) r = SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3_DEFAULT;
 
         if (r == -1) LogPrintf("GetSpork::Unknown Spork %d\n", nSporkID);
     }
@@ -173,19 +186,25 @@ void ReprocessBlocks(int nBlocks)
     }
 }
 
-
-bool CSporkManager::CheckSignature(CSporkMessage& spork)
+bool CSporkManager::CheckSignature(CSporkMessage& spork, bool fCheckSigner)
 {
     //note: need to investigate why this is failing
     std::string strMessage = boost::lexical_cast<std::string>(spork.nSporkID) + boost::lexical_cast<std::string>(spork.nValue) + boost::lexical_cast<std::string>(spork.nTimeSigned);
-    CPubKey pubkey(ParseHex(Params().SporkKey()));
+    CPubKey pubkeynew(ParseHex(Params().SporkKey()));
 
     std::string errorMessage = "";
-    if (!DarKsendSigner.VerifyMessage(pubkey, spork.vchSig, strMessage, errorMessage)) {
+    bool fValidWithNewKey = DarKsendSigner.VerifyMessage(pubkeynew, spork.vchSig, strMessage, errorMessage);
+
+    if (fCheckSigner && !fValidWithNewKey)
         return false;
+
+    // See if window is open that allows for old spork key to sign messages
+    if (!fValidWithNewKey && GetAdjustedTime() < Params().RejectOldSporkKey()) {
+        CPubKey pubkeyold(ParseHex(Params().SporkKeyOld()));
+        return DarKsendSigner.VerifyMessage(pubkeyold, spork.vchSig, strMessage, errorMessage);
     }
 
-    return true;
+    return fValidWithNewKey;
 }
 
 bool CSporkManager::Sign(CSporkMessage& spork)
@@ -269,6 +288,7 @@ int CSporkManager::GetSporkIDByName(std::string strName)
     if (strName == "SPORK_14_NEW_PROTOCOL_ENFORCEMENT") return SPORK_14_NEW_PROTOCOL_ENFORCEMENT;
 	if (strName == "SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2") return SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2;
     if (strName == "SPORK_16_MN_WINNER_MINIMUM_AGE") return SPORK_16_MN_WINNER_MINIMUM_AGE;
+	if (strName == "SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3") return SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3;
 
     return -1;
 }
@@ -288,6 +308,7 @@ std::string CSporkManager::GetSporkNameByID(int id)
     if (id == SPORK_14_NEW_PROTOCOL_ENFORCEMENT) return "SPORK_14_NEW_PROTOCOL_ENFORCEMENT";
 	if (id == SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2) return "SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2";
     if (id == SPORK_16_MN_WINNER_MINIMUM_AGE) return "SPORK_16_MN_WINNER_MINIMUM_AGE";
+	if (id == SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3) return "SPORK_17_NEW_PROTOCOL_ENFORCEMENT_3";
 
     return "Unknown";
 }
