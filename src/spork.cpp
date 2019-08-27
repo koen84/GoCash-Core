@@ -10,7 +10,6 @@
 #include "protocol.h"
 #include "sync.h"
 #include "util.h"
-#include "sporkdb.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -23,6 +22,7 @@ CSporkManager sporkManager;
 
 std::map<uint256, CSporkMessage> mapSporks;
 std::map<int, CSporkMessage> mapSporksActive;
+
 
 void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
@@ -67,9 +67,7 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
         mapSporksActive[spork.nSporkID] = spork;
         sporkManager.Relay(spork);
 
-
-
-       //does a task if needed
+        //does a task if needed
         ExecuteSpork(spork.nSporkID, spork.nValue);
     }
     if (strCommand == "getsporks") {
