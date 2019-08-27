@@ -219,7 +219,7 @@ genesis hash: 00000b1a5a099291be2a4c5fabd507f8d808210bc5455975109111246384a9b8
         fRequireRPCPassword = true;
         fMiningRequiresPeers = true;
         fAllowMinDifficultyBlocks = false;
-        fDefaultConsistencyChecks = true;
+        fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
         fSkipProofOfWorkCheck = true;
